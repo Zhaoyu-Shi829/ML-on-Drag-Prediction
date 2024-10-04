@@ -1,1 +1,5 @@
-# model embedded with Beyessian optimization
+## Model configuration & Hyperparameter tuning
+
+
+* Beyessian optimization `git`
+<img >
