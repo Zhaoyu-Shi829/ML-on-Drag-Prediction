@@ -20,9 +20,10 @@ The focus is to build up a non-linear mapping from surface topographical paramet
   <img src="https://github.com/user-attachments/assets/36aaee46-e288-4e4c-80f3-5885e3141946" width="500" />
 
 </div>
-To learn more about our general approach, read our papers:
-*[Drag prediction of rough-wall turbulent flow using data-driven regression](http://arxiv.org/abs/2405.09256)
-*[Data-driven discovery of drag-inducing elements on a rough surface through convolutional neural networks}](https://doi.org/10.1063/5.0223064)
+
+To learn more about our general approach, read our papers: <br />
+*  [Drag prediction of rough-wall turbulent flow using data-driven regression](http://arxiv.org/abs/2405.09256) <br />
+*  [Data-driven discovery of drag-inducing elements on a rough surface through convolutional neural networks}](https://doi.org/10.1063/5.0223064)
 
 
 
