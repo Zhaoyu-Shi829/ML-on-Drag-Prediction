@@ -6,13 +6,17 @@ predict the momentum deficit $\Delta U^+$ (a scalar) over the homogeneous and ir
 of five types. The labeled data are generated using [CaNS](https://github.com/CaNS-World/CaNS). 
 
 <div align="center">
-# :hugs: Predictin Workflow 
+:hugs: Predictin Workflow 
 
-  insert image
+  ![workflow_sketch_2](https://github.com/user-attachments/assets/36aaee46-e288-4e4c-80f3-5885e3141946)
     
 </div>
+
 <!-- TOC -->
 [🔌 predictive ML models](#codes)
 [🚦 height map data](#data)
 
 <!-- TOC -->
+
+
+
