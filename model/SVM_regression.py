@@ -265,71 +265,7 @@ if __name__ == "__main__":
     main()
 
 
-def k_fold_CV():
-    # If K too large, this leads to less variance across the training set
-    # and limit the model accuracy difference across the iterations
-    kf = KFold(n_splits=5, shuffle=True, random_state=0)
-    err = [pd.DataFrame(columns=['linear', 'rbf']) for _ in range(3)]
-    outliers = [[] for _ in range(3)]
-    sel_size = [10, 19]
-
-    name = ['Gaus', 'Pos', 'Hyb']
-    score_list = [[] for _ in range(3)]
-    for co, data in enumerate([stats_uplus_tag_Gaus, stats_uplus_tag_pos, stats_uplus_tag_shuffle]):
-        train, test = train_test_split(data, test_size=0.2, random_state=0)
-        print(f'---------Type: {co, name[co]}---------')
-        print(f'TRAIN+VAL samp/size: \n {train.index.tolist()[0:5]}; {len(train)} \n '
-              f'TEST samp/size: \n {test.index.tolist()[0:5]}; {len(test)}')
-
-        # USE REGRESSION METRIC R2 TO SCORE ESTIMATOR ON TRAINING+VAL DATASET
-        regr_linear, regr_rbf = svr_linear_model(), svr_rbf_model()
-        sel = sel_size[1]       # change sel size manually
-        for fold, (train_ind, val_ind) in enumerate(kf.split(train)):
-            # print(f'train_ind: {train_ind} \n val_ind: {val_ind}')
-            print(f'Fold={fold} train_size: {len(train.iloc[train_ind])} val_size: {len(train.iloc[val_ind])}')
-
-            train_uplus = norm_1Ddata(train.iloc[train_ind, -2], np.min(train.iloc[train_ind, -2]),
-                                      np.max(train.iloc[train_ind, -2]))
-            train_max, train_min = np.max(train.iloc[:, :sel], axis=0), np.min(train.iloc[:, :sel], axis=0)
-            train_stats = norm_2Ddata(train.iloc[train_ind, :sel].to_numpy(), train_min, train_max)
-
-            val_stats = norm_2Ddata(train.iloc[val_ind, :sel].to_numpy(), train_min, train_max)
-            val_uplus = norm_1Ddata(train.iloc[val_ind, -2], np.min(train.iloc[train_ind, -2]),
-                                    np.max(train.iloc[train_ind, -2]))
-
-            regr_rbf.fit(train_stats, train_uplus)
-            regr_linear.fit(train_stats, train_uplus)
-
-            score_linear = regr_linear.score(val_stats, val_uplus)
-            score_rbf = regr_rbf.score(val_stats, val_uplus)
-            # print(f' sel={sel} \n linear_ker_score={score_linear} \n rbf_ker_score={score_rbf}')
-
-        # PREDICTION
-        test_stats = norm_2Ddata(test.iloc[:, :sel].to_numpy(), np.min(train.iloc[:, :sel], axis=0),
-                                 np.max(train.iloc[:, :sel], axis=0))
-
-        pred_rbf = regr_rbf.predict(test_stats)
-        pred_rbf_phy = denorm_1Ddata(pred_rbf, np.min(train.iloc[:, -2]), np.max(train.iloc[:, -2]))
-        # test[os.path.join('pred_rbf_' + str(sel))] = pred_rbf_phy
-
-        pred_lin = regr_linear.predict(test_stats)
-        pred_lin_phy = denorm_1Ddata(pred_lin, np.min(train.iloc[:, -2]), np.max(train.iloc[:, -2]))
-        # test[os.path.join('pred_lin_' + str(sel))] = pred_lin_phy
-
-        err_rbf = 100 * np.abs((pred_rbf_phy - test['uplus'])) / test['uplus']
-        err_lin = 100 * np.abs((pred_lin_phy - test['uplus'])) / test['uplus']
-        err[co]['linear'] = err_lin
-        err[co]['rbf'] = err_rbf
 
 
-'''
-pd.set_option('display.max_rows', None)
-sample_dns = test.loc[:, ['uplus', 'tag']].iloc[:20, :]
-sample_pred_1 = test.loc[:, ['pred_l_10', 'tag']].iloc[:20, :]
-sort_dns = sample_dns.sort_values(by='uplus')
-sort_pred = sample_pred_1.sort_values(by='pred_l_10')
-# print('sample_dns:', '\n', sample_dns, '\n', 'sample_pred:', '\n', sample_pred)
-print('sort_dns:', '\n', sort_dns, '\n', 'sort_pred:', '\n', sort_pred)
-'''
 
 
