@@ -145,140 +145,6 @@ def calc_save_stats():
     # np.save('./Copy_Data/new_data_five_types/10primary_stats/stats_hyb.npy', stats_hyb)
     # np.save('./Copy_Data/new_data_five_types/uplus_hyb.npy', uplus_hyb)
 
-# calc_save_stats()
-
-
-def plot_U_stats():
-    base_dir = './Copy_Data/new_data_five_types/10primary_stats'
-    stats_src_dir = [os.path.join(base_dir, 'stats_{}.npy').format(i) for i in tags]
-    uplus_src_dir = [os.path.join(base_dir, 'uplus_{}.npy').format(i) for i in tags]
-
-    fig, axes = plt.subplots(2, 4, figsize=(18, 8))
-    ec = ['#e9b03e', '#de1b15', '#989191', '#5ecce3', '#3e70e9', '#652ADE', '#f23b27']
-    xlabel = [r'$k_c$', r'$k_{rms}$', r'$Skw$', r'$Ku$', r'$ES_x$', r'$ES_z$', r'$Inc_x$', r'$Inc_z$']
-    stats_id = [0, 1, 3, 4, 5, 6, 8, 9]
-    type = [r'$I:Sk_0$', r'$II:Sk_+$', r'$III:Sk_-$', r'$IV:\lambda_x$', r'$V:\lambda_z$']
-    for k in range(5):
-        stats_data = np.load(stats_src_dir[k])
-        uplus_data = np.load(uplus_src_dir[k])
-        trans_no = len([i for i in uplus_data if i <= 6.3])
-        fully_no = len(uplus_data) - trans_no
-        print(f'no. trans rough: {trans_no}, no. fully rough: {fully_no}')
-        print(np.min(uplus_data), np.max(uplus_data))
-        data = np.column_stack((stats_data, uplus_data))
-        print(f'type: {k}, isotropy: {np.mean(data[:, 6]/data[:, 5])}')
-        for i, ax in enumerate(fig.axes):
-            ax.locator_params(axis='x', nbins=6)
-            if i in range(len(stats_id)):
-                ax.tick_params(axis='both', which='major', labelsize=18)
-                ax.set_xlabel(xlabel[i], fontsize=20)
-                ax.scatter(data[:, stats_id[i]], data[:, -1], c='None', edgecolors=ec[k], lw=2, s=22, alpha=0.3, label=type[k])
-            if i in [0, 4]:
-                ax.set_ylabel(r'$\Delta U^+$')
-            if i in [2, 3, 5, 6, 7]:
-                ax.axes.get_yaxis().set_visible(False)
-            if i in [2]:
-                ax.set_xlim(-2, 2)
-            if i in [7]:
-                ax.set_xlim(-1, 1)
-            plt.subplots_adjust(wspace=None, hspace=None)
-
-    leg = plt.legend(scatterpoints=1, frameon=False, columnspacing=0.2, handletextpad=0.1, ncol=1, fontsize=12, loc=3)
-    for lh in leg.legendHandles:
-        lh.set_alpha(1)
-    plt.tight_layout()
-    plt.subplots_adjust(wspace=0.03, hspace=0.3)
-    # plt.savefig('/lscratch/zhaoyus/proj/cnn/My_CNN/plots/stats_hyb_data_2.jpeg', dpi=600)
-    # plt.show()
-
-# plot_U_stats()
-
-def plot_single_U():
-    base_dir = './Copy_Data/new_data_five_types/10primary_stats'
-    stats_src_dir = [os.path.join(base_dir, 'stats_{}.npy').format(i) for i in tags]
-    uplus_src_dir = [os.path.join(base_dir, 'uplus_{}.npy').format(i) for i in tags]
-
-    fig, ax = plt.subplots(2, 2, figsize=(11, 8))
-    # [ax[i, j].set_rasterized(True) for i in (0, 1) for j in (0, 1)]
-    ax[0, 0].set_ylabel(r'$\Delta U^+$')
-    ax[1, 0].set_ylabel(r'$\Delta U^+$')
-    [ax[i, j].set_ylim(0, 9) for i in (0, 1) for j in (0, 1)]
-
-    ec = ['#e9b03e', '#de1b15', '#989191', '#5ecce3', '#3e70e9', '#652ADE', '#f23b27']
-    xlabel = [r'$k^+_{rms}$', r'$ES_x$', r'$Skw$', r'$Ku$']
-    type = [r'$I:Sk_0$', r'$II:Sk_{+}$', r'$III:Sk\_$', r'$IV:\lambda_x$', r'$V:\lambda_z$']
-    ax[0, 0].set_xlabel(xlabel[0], fontsize=22)
-    ax[0, 0].set_xlim(1.5, 13.5)
-    ax[1, 0].set_xlabel(xlabel[1], fontsize=22)
-    ax[1, 0].set_xlim(0.1, 0.9)
-    ax[0, 1].set_xlabel(xlabel[2], fontsize=22)
-    ax[0, 1].set_xlim(-2, 2)
-    ax[1, 1].set_xlabel(xlabel[3], fontsize=22)
-    ax[1, 1].set_xlim(2, 8)
-    ax[0, 1].yaxis.set_ticklabels([])
-    ax[1, 1].yaxis.set_ticklabels([])
-    for k in range(5):
-        stats_data = np.load(stats_src_dir[k])
-        uplus_data = np.load(uplus_src_dir[k])
-        data = np.column_stack((stats_data, uplus_data))
-
-        ax[0, 0].scatter(data[:, 1], data[:, -1], c='None', edgecolors=ec[k], lw=2, s=22, alpha=0.3,
-                         label=type[k])
-        ax[0, 1].scatter(data[:, 3], data[:, -1], c='None', edgecolors=ec[k], lw=2, s=22, alpha=0.3,
-                         label=type[k])
-        ax[1, 0].scatter(data[:, 5], data[:, -1], c='None', edgecolors=ec[k], lw=2, s=22, alpha=0.3,
-                         label=type[k])
-        ax[1, 1].scatter(data[:, 4], data[:, -1], c='None', edgecolors=ec[k], lw=2, s=22, alpha=0.3,
-                         label=type[k])
-    ax[0, 0].plot([3.2, 6], [2.7, 6.2], [6, 11], [4.0, 6.5], ls='--', color='k')
-    circle = plt.Circle((5.3, 4.5), 0.8, ls='--', lw=1.6, color='k', fill=False)
-    ax[1, 1].add_patch(circle)
-
-    leg = plt.legend(scatterpoints=1, frameon=False, columnspacing=0.1, handletextpad=0.1, ncol=5, fontsize=22,
-                     loc='upper center', bbox_to_anchor=(-0.1, 2.58), markerscale=3)
-    for lh in leg.legendHandles:
-        lh.set_alpha(1)
-    plt.tight_layout()
-    plt.subplots_adjust(top=0.9, wspace=0.12, hspace=0.3)
-    plt.savefig('./Figures/draft/scatter_params.jpeg', format='jpeg', dpi=600)
-    plt.show()
-
-# plot_single_U()
-
-
-def plot_bivariate_stats():
-    # kc, krms, Ra, skw, kur, ESx, ESz, Po, incx, incz
-    # Ex*Ez[10], Ex*Sk[11], Ez*Sk[13], Ex*Ex[17], Ez*Ez[18]
-    base_dir = './Copy_Data/new_data_five_types/10primary_stats'
-    ec = ['#e9963e', '#B80F0A', '#65a9d7', '#652ADE', '#304f9e', '#00145A', '#f23b27']
-    # ec = ['#e9963e', '#f23b27', '#65a9d7', '#304f9e']
-    xtick = [r'$k_c$', r'$Ra$', r'$k_{rms}$', r'$Sk$', r'$Kur$', r'$E_x$', r'$E_z$', r'$Po$']
-    # xtick = [r'$E_x*E_z$', r'$E_x*Sk$', r'$E_z*Sk$', r'$E_x*E_x$', r'$E_z*E_z$']
-
-    stats_dir = [os.path.join(base_dir, 'stats_{}.npy').format(tags[i]) for i in range(5)]
-    fig, ax = plt.subplots(1, 5, figsize=(14, 4), constrained_layout=True)
-    [ax[i].get_yaxis().set_visible(False) for i in [1, 2, 3, 4]]
-    [ax[i].set_xlabel(xtick[i]) for i in range(5)]
-    [ax[i].tick_params(axis='both', which='major', labelsize=16) for i in range(5)]
-
-    for i in range(len(stats_dir)):
-        data = np.load(stats_dir[i])
-        krms, skw, kurt, Ex, Ez, Po = data[:, 1], data[:, 2], data[:, 3], data[:, 4], data[:, 5], data[:, 7]
-        print(i, np.min(data[:, 8]), np.max(data[:, 8]), np.min(data[:, 9]), np.max(data[:, 9]))
-        I10, I11, I13, I17, I18 = data[:, 10], data[:, 11], data[:, 13], data[:, 17], data[:, 18]
-        ax[0].scatter(I10, krms, color=ec[i], s=22, alpha=0.4)
-        ax[0].set_ylabel(r'$k_{rms}$', fontsize=26)
-        ax[1].scatter(I11, krms, color=ec[i], s=22, alpha=0.4)
-        ax[2].scatter(I13, krms, color=ec[i], s=22, alpha=0.4)
-        ax[3].scatter(I17, krms, color=ec[i], s=22, alpha=0.4)
-        ax[4].scatter(I18, krms, color=ec[i], s=22, alpha=0.4)
-
-    plt.tight_layout()
-    plt.show()
-
-# plot_bivariate_stats()
-
-
 def plot_correlation_map():
     # kc, krms, Ra, skw, kur, ESx, ESz, Po, incx, incz
     cls = 4
@@ -390,37 +256,14 @@ def plot_correlation_map():
     plt.savefig(os.path.join("./Figures/draft", cls_name[cls]+"_corr.jpeg"), dpi=300)
     plt.show()
 
-# plot_correlation_map()
+
+def main():
+      # calc_integral_length()
+      calc_save_stats()
+      plot_correlation_map()
+      
+if __name__ == "__main__":
+    main()  
 
 
-def plot_kde():
-    cls = -1
-    tags = ['gaus', 'pos', 'neg', 'Ex', 'Ez', 'hyb']
-    base_dir = './Copy_Data/new_data_five_types/10primary_stats'
-    stats_dir = os.path.join(base_dir, 'stats_{}.npy'.format(tags[cls]))
-    uplus_dir = os.path.join(base_dir, 'uplus_{}.npy'.format(tags[cls]))
-    stats_data = np.squeeze(np.load(stats_dir))
-    uplus_data = np.squeeze(np.load(uplus_dir))
 
-    fig, ax = plt.subplots(2, 2, figsize=(8, 8))
-    # for i, j in ax:
-    #     ax[i, j].set_xticklabels(fontsize=10)
-    # krms, Ex, Ez, Skw
-    x_range, kde = [], []
-    for i in [1, 3, 5, 6]:
-        data = stats_data[:, i].astype('float32')
-        kde.append(scipy.stats.gaussian_kde(data))
-        x_range.append(np.linspace(np.min(data), np.max(data), 200))
-
-    ax[0, 0].plot(x_range[0], kde[0](x_range[0]), lw=2)  # krms
-    ax[0, 0].set_xlabel(r'$k_{rms}^+$')
-    ax[0, 1].plot(x_range[1], kde[1](x_range[1]), lw=2)  # Ex
-    ax[0, 1].set_xlabel(r'$Skw$')
-    ax[1, 0].plot(x_range[2], kde[2](x_range[2]), lw=2)  # Ez
-    ax[1, 0].set_xlabel(r'$E_x$')
-    ax[1, 1].plot(x_range[3], kde[3](x_range[3]), lw=2)  # Skw
-    ax[1, 1].set_xlabel(r'$E_z$')
-    plt.tight_layout()
-    plt.show()
-
-plot_kde()
