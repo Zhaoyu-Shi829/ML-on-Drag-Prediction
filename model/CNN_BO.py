@@ -4,7 +4,6 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 os.environ['MPLCONFIGDIR'] = '/lscratch/zhaoyus/tmp'
 #sys.path.append('/lscratch/zhaoyus/python_packages')
 import time
-import logging
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
@@ -51,7 +50,6 @@ no_epoch = 300
 opt_flag = False
 train_test_flag = True
 # save directory of BO hyperparams, training
-# USE THE FIRST VERSION OF CODE TO CHECK REPRODUCIBILITY: CNN_BO_zy_hyb_fs1
 save_BO_dir = './tmp_cnn_BO/pre_test_4_rerun/hyb_sd{}_n{}_BOhp_ofstd_old.csv'.format(no_sd, no_eval)
 save_BOloss_dir = './tmp_cnn_BO/pre_test_4_rerun/hyb_sd{}_n{}_BOloss_ofstd.csv'.format(no_sd, no_eval)
 save_loss_dir = './tmp_cnn_BO/pre_test_4_rerun/hyb_sd{}_n{}_loss_pred_ofstd.jpeg'.format(no_sd, no_eval)
@@ -100,7 +98,6 @@ def lr_scheduler(epoch, learning_rate):
         return learning_rate
 
 new_lr = LearningRateScheduler(lr_scheduler, verbose=1)
-
 
 # NORMALIZATION
 x_train = train.iloc[:, :-1].to_numpy().reshape(len(train), map_dim[0], map_dim[1])
@@ -237,14 +234,7 @@ if opt_flag:
                          n_restarts_optimizer=10, n_jobs=-1, verbose=False, callback=iter_fun)
     print("Best parameters: ", result.x)
     print("Minimum val loss: ", result.fun)
-    ### edited by Jiasheng
-    # save_hps = {"n_layers": result.x[0], "n_filters": result.x[1], "kernel_size": result.x[2], "lr": result.x[3],
-    #             "regularization": result.x[4], "activation": result.x[5], "initialization": result.x[6],
-    #             "batch_size": result.x[7], "val_batch_size": result.x[8]}
-    # df = pd.DataFrame(save_hps, index=[0])
-    # df.to_csv(save_pred_dir, mode='a', index=False, sep=';')
-    ####
-    #dump(result, './tmp_cnn_BO/gaus_BO_cnn_sd24_20.json')
+
 
 if train_test_flag:
     print("----------Loading BO hyperparams -----------")
@@ -273,6 +263,8 @@ if train_test_flag:
     err = 100 * np.abs(np.squeeze(y_pred) - y_test) / y_test
     print('mean err %: ', np.mean(err))
 
+
+    # Visualize the loss curve and the prediction error
     fig, axs = plt.subplots(ncols=3, figsize=(24, 8))
     axs[0].set_xlabel(r'$epoch$', fontsize=25)
     axs[0].set_ylabel(r'$loss$', fontsize=25)
@@ -300,20 +292,6 @@ if train_test_flag:
     axs[0].legend(framealpha=0.0, fontsize=20)
     plt.tight_layout()
     plt.savefig(save_loss_dir, dpi=600)
-    #plt.savefig('./tmp_cnn_BO/pre_test_3/hyb_sd22_sd12_loss_pred_ofsglobal_stdnorm_fs.jpeg', dpi=600)
     plt.show()
 
-    # palette = ['#FF2709', '#0030D7', '#01FBEE', '#09EE90', '#FA70B5', '#00145A', '#7FFFD4']
-    # plt.gcf().set_size_inches(12, 8)
-    # plt.ylabel(r'$Loss(MSE)$', fontsize=25)
-    # plt.xlabel(r'$Epoch$', fontsize=25)
-    # plt.plot(np.arange(0, len(np.squeeze(val_loss_list))), np.squeeze(val_loss_list), 'go-',
-             # lw=3, ms=8, mfc='none', mew=2.5, label='validation')
-    # plt.plot(np.arange(0, len(np.squeeze(train_loss_list))), np.squeeze(train_loss_list), 'ko-',
-             # lw=3, ms=8, mfc='none', mew=2.5, label='train')
-    # plt.legend(framealpha=0.0)
-    # plt.savefig('./loss_curves_20.jpeg', dpi=600)
-    # plt.annotate('CNN drag prediction: ' + str(pred[-1]), (1.0, 10), fontsize=16)
-    # plt.annotate('True drag value: ' + str(y_test[-1]), (1.0, 30), fontsize=16)
-    # plt.show()
 
