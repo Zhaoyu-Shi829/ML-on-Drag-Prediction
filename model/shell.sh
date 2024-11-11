@@ -1,21 +1,25 @@
 #!/bin/bash
-
+ 
 # Environmental varaibles
-export PYTHONUSERBASE=/lscratch/zhaoyus/python_packages
+USER_BASE_DIR="/lscratch/username"               # Replace 'username' with your actual username
+CUDA_VERSION="11.4"                              # Specify CUDA version
+HPC_SDK_VERSION="21.9"      
+
+export PYTHONUSERBASE="$USER_BASE_DIR/python_packages"
 echo $PYTHONUSERBASE
 
 # NVIDIA config
-export NVHPC=/lscratch/zhaoyus/Nvidia/hpc-sdk
-export NVHPC_ROOT=/lscratch/zhaoyus/Nvidia/hpc-sdk/Linux_x86_64/21.9
-export PATH=/lscratch/zhaoyus/Nvidia/hpc-sdk/Linux_x86_64/21.9/cuda/bin:$PATH
-export PATH=/lscratch/zhaoyus/Nvidia/hpc-sdk/Linux_x86_64/21.9/comm_libs/mpi/bin:$PATH
-export LD_LIBRARY_PATH=/lscratch/zhaoyus/Nvidia/hpc-sdk/Linux_x86_64/21.9/cuda/lib64:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=/lscratch/zhaoyus/Nvidia/hpc-sdk/Linux_x86_64/21.9/cuda/11.4/extras/CUPT1/lib64:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=/lscratch/zhaoyus/Nvidia/hpc-sdk/Linux_x86_64/21.9/comm_libs/mpi/lib:$LD_LIBRARY_PATH
-export CPATH=/lscratch/zhaoyus/Nvidia/hpc-sdk/Linux_x86_64/21.9/comm_libs/mpi/include:$CPATH
+export NVHPC="$USER_BASE_DIR/Nvidia/hpc-sdk"
+export NVHPC_ROOT="$NVHPC/Linux_x86_64/$HPC_SDK_VERSION"
+export PATH="$NVHPC_ROOT/cuda/bin:$PATH"
+export PATH="$NVHPC_ROOT/comm_libs/mpi/bin:$PATH"
+export LD_LIBRARY_PATH="$NVHPC_ROOT/cuda/lib64:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$NVHPC_ROOT/cuda/$CUDA_VERSION/extras/CUPTI/lib64:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$NVHPC_ROOT/comm_libs/mpi/lib:$LD_LIBRARY_PATH"
+export CPATH="$NVHPC_ROOT/comm_libs/mpi/include:$CPATH"
 
-export OPAL_PREFIX=/lscratch/zhaoyus/Nvidia/hpc-sdk/21.9/comm_libs/mpi
-export XLA_FLAGS=--xla_gpu_cuda_data_dir=/lscratch/zhaoyus/Nvidia/hpc-sdk/Linux_x86_64/21.9/cuda/11.4/
+export OPAL_PREFIX="$NVHPC/$HPC_SDK_VERSION/comm_libs/mpi"
+export XLA_FLAGS="--xla_gpu_cuda_data_dir=$NVHPC_ROOT/cuda/$CUDA_VERSION/"
 
 # Run python script
-python3 CNN_BO_zy_gpu.py
+python3 CNN_BO.py
