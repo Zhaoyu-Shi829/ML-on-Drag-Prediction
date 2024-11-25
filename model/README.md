@@ -1,3 +1,16 @@
+## Directory structure: </br>
+├── src/             </br>
+│   ├── model.py               # Model architecture and BO configuration            </br>
+│   ├── train.py               # Training, validation, and testing logic            </br>
+│   ├── data_processing.py     # Data loading and preprocessing functions           </br>
+│   ├── config.py              # Configuration parameters                           </br>
+│   └── utils.py               # Utility functions like normalization and plotting  </br>
+├── README.md                  # Project description                                </br>
+├── requirements.txt           # List of dependencies                               </br>
+└── main.py                    # Script to start training or testing                </br>
+
+
+
 ## Model configuration
 * Model inputs: 
   * LR, SVR, MLP use topographical parameters of surface height: `height features` ($k_{rms}, k_{avg}, k_c$) and `effective slopes` ($Ex_x, Ex_z$) 
@@ -15,5 +28,4 @@
       <img src="https://github.com/user-attachments/assets/dc81c5fa-f1ed-432c-a74d-260f0332dadd" width=400 />
     </div>
   
-
 
