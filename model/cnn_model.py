@@ -1,5 +1,4 @@
 import time
-import logging
 import os
 import pandas as pd
 import numpy as np
@@ -15,8 +14,8 @@ from sklearn.model_selection import cross_val_score, train_test_split
 from skopt import gp_minimize
 from skopt.space import Real, Integer, Categorical
 from skopt.utils import use_named_args
-from config import map_dim, no_eval, no_sd, no_epoch
-from config import base_dir, save_BO_dir, save_loss_dir, save_ckpt_dir
+from config import map_dim, no_eval_cnn, no_sd, no_epoch
+from config import base_dir, cnn_BO_dir, cnn_loss_dir, cnn_ckpt_dir
 from config import opt_flag, train_Test_flag
 from utils import tags, configure_plots
 
@@ -152,7 +151,7 @@ def objective(space):
   strategy = tf.distribute.MirroredStrategy(cross_device_ops=tf.distribute.ReductionToOneDevice())
   with strategy.scope():
     model = build_model(space)
-    # ckpt_filepath = os.path.join(save_ckpt_dir, 'model_{epoch:03d}_{val_loss:.4f}.h5')
+    # ckpt_filepath = os.path.join(cnn_ckpt_dir, 'model_{epoch:03d}_{val_loss:.4f}.h5')
     # ckpt = ModelCheckpoint(ckpt_filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
     start_epoch = time.time()
     es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=20)
@@ -164,7 +163,7 @@ def objective(space):
     train_loss, val_loss = history.history['loss'], history.history['val_loss']
     '''
     # plot train/val loss at the last evaluation of BO
-    if iter_fun.counter == no_eval - 1:
+    if iter_fun.counter == no_eval_cnn - 1:
         fig, ax = plt.subplots(figsize=(8, 8))
         ax.plot(np.arange(0, len(np.squeeze(val_loss))), np.squeeze(val_loss), color='#e9963e',
                 marker='o', lw=2.5, ms=5, mfc='none', mew=2, label=os.path.join(r'$val$'))
@@ -188,10 +187,9 @@ def iter_fun(result):
                         "batch_size": result.x[15],
                         "val_batch_size": result.x[16]}
     df_BO = pd.DataFrame(save_iter_result, index=[0])
-    df_BO.to_csv(save_BO_dir, mode='a', header=False, index=False, sep=';')
+    df_BO.to_csv(cnn_BO_dir, mode='a', header=False, index=False, sep=';')
     print(f"Iteration {iter_fun.counter} - f({result.x}): {result.fun}")
-    df_BO_loss = pd.DataFrame(result.func_vals)
-    df_BO_loss.to_csv(save_BOloss_dir)
+
 
 def plot_loss(val_loss, val_mse, train_loss, train_mse):
     fig, ax = plt.subplots(ncols=2, figsize=(16, 8))
@@ -212,20 +210,20 @@ def plot_loss(val_loss, val_mse, train_loss, train_mse):
                marker='o', lw=2., ms=5, mfc='none', mew=2, label=os.path.join(r'$training$'))
 
     ax[0].legend(framealpha=0.0, fontsize=20, handletextpad=0.1)
-    # plt.savefig(save_loss_dir, dpi=600)
+    plt.savefig(cnn_loss_dir, dpi=600)
     plt.show()
 
 if opt_flag:
     print("-----------Run BO to find the optimal hps------------")
     iter_fun.counter = 0
-    result = gp_minimize(func=objective, dimensions=space, n_calls=no_eval, random_state=42, acq_func='gp_hedge',
+    result = gp_minimize(func=objective, dimensions=space, n_calls=no_eval_cnn, random_state=42, acq_func='gp_hedge',
                          n_restarts_optimizer=10, n_jobs=-1, verbose=False, callback=iter_fun)
     print(f"Best parameters: , {result.x}")
     print(f"Minimum val loss: , {result.fun}")
 
 if train_test_flag:
     print("----------Loading BO hyperparams -----------")
-    best_params_csv = pd.read_csv(save_BO_dir, sep=";")
+    best_params_csv = pd.read_csv(cnn_BO_dir, sep=";")
     final_model = build_model(best_params_csv.iloc[-1].values.tolist())
     print(f'best params: {best_params_csv.iloc[-1].values.tolist()}')
     print("----------Starting Training -----------")
@@ -242,7 +240,7 @@ if train_test_flag:
     y_pred = final_model.predict(x_test_norm)
     save_pred = {"pred": np.squeeze(y_pred), "dns": y_test, "tag": tag_test}
     df = pd.DataFrame(save_pred)
-    df.to_csv(save_pred_dir, index=False, sep=';')
+    df.to_csv(cnn_pred_dir, index=False, sep=';')
     # df.to_csv('./tmp_cnn_BO/pre_test_3/hyb_sd22_sd12_pred_dns_ofsglobal_stdnorm_fs.csv', index=False, sep=';')
     print(f'pred .vs. dns \n {np.c_[y_pred, y_test]}')
     print(f'pred mean U+: {np.mean(y_pred)}, DNS mean U+: {np.mean(y_test)}')
