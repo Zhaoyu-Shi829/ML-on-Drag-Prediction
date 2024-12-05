@@ -15,16 +15,14 @@ from skopt.space import Real, Integer, Categorical
 from skopt.utils import use_named_args
 from sklearn.metrics import r2_score
 from utils import tags, labels, palette, configure_plots
-from utils import no_eval_mlp, no_sd, no_epoch, no_stats, no_layer
-from config import opt_flag, train_Test_flag, cls
-from config import stats_base_dir, mlp_BO_dir, mlp_loss_dir, mlp_ckpt_dir
+from config import no_eval_mlp, no_sd, no_epoch, no_stats, no_layer
+from config import opt_flag, train_Test_flag, cls, uplus_pos
+from config import stats_base_dir, mlp_BO_dir, mlp_loss_dir
 
 configure_plots()
 
 print(f'tensor version: {tf.version.VERSION}')
 keras.utils.set_random_seed(1)
-
-uplus_pos = -2   # single dataset -1 (no tag); hybrid dataset -2 (tag)
 
 # DEFINE GENERAL NORM EQUATIONS
 def norm_2Ddata(data, min_inp, max_inp):    # rescaled input to [-1, 1]
