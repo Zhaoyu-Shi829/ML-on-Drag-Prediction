@@ -16,8 +16,8 @@ from skopt.utils import use_named_args
 from sklearn.metrics import r2_score
 from utils import tags, configure_plots
 from utils import no_eval_mlp, no_sd, no_epoch, no_stats, no_layer
-from config import opt_flag, train_Test_flag
-from config import mlp_base_dir, mlp_BO_dir, mlp_loss_dir, mlp_ckpt_dir
+from config import opt_flag, train_Test_flag, cls
+from config import stats_base_dir, mlp_BO_dir, mlp_loss_dir, mlp_ckpt_dir
 
 configure_plots()
 
@@ -25,7 +25,6 @@ print(f'tensor version: {tf.version.VERSION}')
 keras.utils.set_random_seed(1)
 
 uplus_pos = -2   # single dataset -1 (no tag); hybrid dataset -2 (tag)
-cls = -1         # correspond to tags, -1: hybrid data
 
 # DEFINE GENERAL NORM EQUATIONS
 def norm_2Ddata(data, min_inp, max_inp):    # rescaled input to [-1, 1]
@@ -54,8 +53,8 @@ new_lr = LearningRateScheduler(lr_scheduler, verbose=1)
 
 
 # load dataset
-stats_dir = os.path.join(mlp_base_dir, 'stats_{}.npy'.format(tags[cls]))
-uplus_dir = os.path.join(mlp_base_dir, 'uplus_{}.npy'.format(tags[cls]))
+stats_dir = os.path.join(stats_base_dir, 'stats_{}.npy'.format(tags[cls]))
+uplus_dir = os.path.join(stats_base_dir, 'uplus_{}.npy'.format(tags[cls]))
 stats_data = np.squeeze(np.load(stats_dir))
 uplus_data = np.squeeze(np.load(uplus_dir))
 data_one = pd.DataFrame(np.column_stack((stats_data, uplus_data)))
