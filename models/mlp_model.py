@@ -14,7 +14,7 @@ from skopt import gp_minimize
 from skopt.space import Real, Integer, Categorical
 from skopt.utils import use_named_args
 from sklearn.metrics import r2_score
-from utils import tags, configure_plots
+from utils import tags, labels, palette, configure_plots
 from utils import no_eval_mlp, no_sd, no_epoch, no_stats, no_layer
 from config import opt_flag, train_Test_flag, cls
 from config import stats_base_dir, mlp_BO_dir, mlp_loss_dir, mlp_ckpt_dir
@@ -164,8 +164,7 @@ def plot_loss_diag(data, err, val_loss, val_mse, train_loss, train_mse):
     fig, ax = plt.subplots(ncols=3, figsize=(24, 8))
     [ax[i].set_box_aspect(1) for i in range(3)]
     [ax[i].locator_params(axis='y', nbins=10) for i in range(2)]
-    palette = ['#e9b03e', '#de1b15', '#989191', '#5ecce3', '#3e70e9', '#652ADE', '#f23b27']
-    label = [r'$I:Sk_0$', r'$II:Sk_{pos}$', r'$III:Sk_{neg}$', r'$IV:\lambda_x$', r'$V:\lambda_z$']
+
     ax[0].set_xlabel(r'$epoch$', fontsize=25)
     ax[0].set_ylabel(r'$loss$', fontsize=25)
     ax[1].set_xlabel(r'$epoch$', fontsize=25)
@@ -178,19 +177,19 @@ def plot_loss_diag(data, err, val_loss, val_mse, train_loss, train_mse):
     ax[2].plot(np.arange(0, 10), np.arange(0, 10), color='k', ls='--', lw=2.5)
 
     ax[0].plot(np.arange(1, len(np.squeeze(val_loss))), np.squeeze(val_loss)[1:], color='#DC381F',
-                marker='o', lw=2., ms=5, mfc='none', mew=2, label=os.path.join(r'$validation$'))
+               marker='o', lw=2., ms=5, mfc='none', mew=2, label=os.path.join(r'$validation$'))
     ax[0].plot(np.arange(1, len(np.squeeze(train_loss))), np.squeeze(train_loss[1:]), color='#5865F2',
-                marker='o', lw=2., ms=5, mfc='none', mew=2, label=os.path.join(r'$training$'))
+               marker='o', lw=2., ms=5, mfc='none', mew=2, label=os.path.join(r'$training$'))
     ax[1].plot(np.arange(1, len(np.squeeze(val_mse))), np.squeeze(val_mse[1:]), color='#DC381F',
-                marker='o', lw=2., ms=5, mfc='none', mew=2, label=os.path.join(r'$validation$'))
+               marker='o', lw=2., ms=5, mfc='none', mew=2, label=os.path.join(r'$validation$'))
     ax[1].plot(np.arange(1, len(np.squeeze(train_mse))), np.squeeze(train_mse[1:]), color='#5865F2',
-                marker='o', lw=2., ms=5, mfc='none', mew=2, label=os.path.join(r'$training$'))
+               marker='o', lw=2., ms=5, mfc='none', mew=2, label=os.path.join(r'$training$'))
 
     split_lst = [[] for _ in range(5)]
     for i in range(5):
         split_lst[i] = [item[0:2].astype('float') for item in data.to_numpy() if str(item[-1]) == tags[i]]
         ax[2].scatter(np.squeeze(split_lst[i])[:, 0], np.squeeze(split_lst[i])[:, 1], c=palette[i], s=50, alpha=0.8,
-                      label=label[i])
+                      label=labels[i])
     ax[2].text(0.5, 8, os.path.join(r'$Err=$' + '{:.2f}%'.format(np.mean(err))), fontsize=24)
     ax[2].text(0.5, 7, os.path.join(r'$R_2=$' + '{:.2f}'.format(r2_score(data.to_numpy()[:, 0], data.to_numpy()[:, 1]))),
                fontsize=24)
