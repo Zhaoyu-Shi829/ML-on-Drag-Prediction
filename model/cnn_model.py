@@ -1,7 +1,10 @@
-import time
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
+os.environ['MPLCONFIGDIR'] = '/lscratch/zhaoyus/tmp'  # change into your own DIR
+import time
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers, initializers, regularizers, activations
@@ -15,7 +18,7 @@ from skopt import gp_minimize
 from skopt.space import Real, Integer, Categorical
 from skopt.utils import use_named_args
 from config import map_dim, no_eval_cnn, no_sd, no_epoch
-from config import base_dir, cnn_BO_dir, cnn_loss_dir, cnn_ckpt_dir
+from config import cnn_base_dir, cnn_BO_dir, cnn_loss_dir, cnn_ckpt_dir
 from config import opt_flag, train_Test_flag
 from utils import tags, configure_plots
 
