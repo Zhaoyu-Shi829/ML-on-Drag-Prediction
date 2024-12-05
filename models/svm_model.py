@@ -11,7 +11,8 @@ from sklearn import svm
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import r2_score
 from utils import configure_plots, palette, labels, tags
-from config import svm_val_flag, svm_test_flag, svm_pred_dir, cls
+from config import svm_val_flag, svm_test_flag, svm_pred_dir, stats_base_dir
+from config import cls, no_stats, uplus_pos
 
 configure_plots()
 
