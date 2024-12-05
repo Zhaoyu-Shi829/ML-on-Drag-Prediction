@@ -1,0 +1,6 @@
+tensorflow>=2.8
+pandas
+scikit-learn
+matplotlib
+seaborn
+skopt
